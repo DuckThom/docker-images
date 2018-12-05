@@ -24,10 +24,10 @@ RUN docker-php-ext-configure \
     exif \
     bcmath
 
-ADD docker-php-pecl-install /usr/local/bin
-RUN docker-php-pecl-install xdebug-2.3.3
-COPY xdebug.ini /usr/local/etc/php/conf.d
-RUN echo "xdebug.remote_host=$(/sbin/ip route|awk '/default/ { print $3 }')" >> /usr/local/etc/php/conf.d/xdebug.ini
+#ADD docker-php-pecl-install /usr/local/bin
+#RUN docker-php-pecl-install xdebug-2.3.3
+#COPY xdebug.ini /usr/local/etc/php/conf.d
+#RUN echo "xdebug.remote_host=$(/sbin/ip route|awk '/default/ { print $3 }')" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 # Apache configuration
 RUN rm -rf /etc/apache2/sites-enabled/000-default.conf

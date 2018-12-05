@@ -1,4 +1,4 @@
-FROM php:5.5-apache
+FROM php:7.2-apache
 
 # Container dependencies
 RUN apt-get update \
@@ -6,8 +6,7 @@ RUN apt-get update \
     zlib1g-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
-    libmcrypt-dev \
-    libpng12-dev \
+    libpng-dev \
     libxml2-dev \
     wget ssmtp
 
@@ -17,15 +16,14 @@ RUN docker-php-ext-configure \
     gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
  && docker-php-ext-install \
     pdo_mysql \
-    mcrypt \
     gd \
     soap \
     simplexml \
     exif \
     bcmath
 
-ADD docker-php-pecl-install /usr/local/bin
-RUN docker-php-pecl-install xdebug-2.3.3
+#ADD docker-php-pecl-install /usr/local/bin
+RUN pecl install xdebug
 COPY xdebug.ini /usr/local/etc/php/conf.d
 RUN echo "xdebug.remote_host=$(/sbin/ip route|awk '/default/ { print $3 }')" >> /usr/local/etc/php/conf.d/xdebug.ini
 
