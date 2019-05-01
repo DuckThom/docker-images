@@ -12,6 +12,21 @@ cat << EOF
 vcl 4.0;
 import std;
 
+sub vcl_recv {
+    if (req.method == "BAN") {
+EOF
+
+for DOMAIN in $(echo $DOMAINS | tr "," "\n"); do
+cat << EOF
+    ban("req.http.host == ${DOMAIN}");
+EOF
+done
+
+cat << EOF
+        # Throw a synthetic page so the request won't go to the backend.
+        return(synth(200, "Ban added"));
+    }
+}
 EOF
 
 # BACKENDS
