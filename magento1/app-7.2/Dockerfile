@@ -7,13 +7,14 @@ RUN apt-get update \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     libpng-dev \
+    libwebp-dev \
     libxml2-dev \
     wget ssmtp
 
 # PHP configuration
 ADD php.ini /usr/local/etc/php/
 RUN docker-php-ext-configure \
-    gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-webp-dir=/usr/include/ \
  && docker-php-ext-install \
     pdo_mysql \
     gd \
@@ -70,7 +71,7 @@ RUN apt-get update \
 
 # Install composer
 ENV COMPOSER_VERSION 1.8.4
-RUN wget https://getcomposer.org/download/1.8.4/composer.phar \
+RUN wget https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar \
  && mv composer.phar /tmp/composer.phar \
  && mkdir /var/www/.composer \
  && chmod +x /tmp/composer.phar \
@@ -81,3 +82,10 @@ RUN wget https://getcomposer.org/download/1.8.4/composer.phar \
 RUN apt-get autoremove --purge -y \
  && apt-get clean -y \
  && apt-get autoclean -y
+
+ # Fix ctrl-left and ctrl-right shortcut
+RUN echo "bind '\"\e[1;5C\":forward-word'" >> /etc/bash.bashrc
+RUN echo "bind '\"\e[1;5D\":backward-word'" >> /etc/bash.bashrc
+
+# Set a nice bash prompt
+RUN echo "PS1='\[\033[0;32m\]\[\033[0m\033[0;32m\]\u\[\033[0;36m\] @ Docker container \[\033[0;36m\]\h \w\[\033[0;32m\]\n\[\033[0;32m\]└─\[\033[0m\033[0;32m\] \$\[\033[0m\033[0;32m\] ▶\[\033[0m\] '" >> /etc/bash.bashrc
