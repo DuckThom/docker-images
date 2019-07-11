@@ -10,11 +10,12 @@ RUN apt-get update -y \
     libmcrypt-dev \
     libicu-dev \
     libxslt-dev \
+    libwebp-dev \
     libxml2-dev
 
 # Install php modules
 RUN docker-php-ext-configure gd \
-    --enable-gd-native-ttf --with-jpeg-dir=/usr/lib/x86_64-linux-gnu/ --with-png-dir=/usr/lib/x86_64-linux-gnu/ --with-freetype-dir=/usr/lib/x86_64-linux-gnu/ \
+    --enable-gd-native-ttf --with-jpeg-dir=/usr/lib/x86_64-linux-gnu/ --with-png-dir=/usr/lib/x86_64-linux-gnu/ --with-freetype-dir=/usr/lib/x86_64-linux-gnu/ --with-webp-dir=/usr/lib/x86_64-linux-gnu/ \
  && docker-php-ext-install \
     gd dom hash iconv intl pdo_mysql simplexml xsl bcmath soap zip ctype
 
@@ -71,5 +72,9 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ssmtp
 ADD ./ssmtp.conf /etc/ssmtp/ssmtp.conf
+
+# Install a MySQL client
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends mysql-client
 
 WORKDIR /var/www/html
