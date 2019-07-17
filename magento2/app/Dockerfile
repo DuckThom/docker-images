@@ -45,7 +45,8 @@ ADD php.ini /usr/local/etc/php/
 RUN rm -rf /etc/apache2/sites-enabled/000-default.conf
 ADD ./apache.conf /etc/apache2/sites-available/
 RUN ln -s /etc/apache2/sites-available/apache.conf /etc/apache2/sites-enabled/
-RUN a2enmod rewrite
+RUN a2enmod rewrite \
+ && a2enmod headers
 
 # Install git and ssh
 RUN apt-get update \
@@ -76,5 +77,14 @@ ADD ./ssmtp.conf /etc/ssmtp/ssmtp.conf
 # Install a MySQL client
 RUN apt-get update \
  && apt-get install -y --no-install-recommends mysql-client
+
+# Install mod_pagespeed
+RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb \
+ && dpkg -i mod-pagespeed-stable_current_amd64.deb \
+ && apt-get install -f -y \
+ && rm mod-pagespeed-stable_current_amd64.deb
+
+RUN apt-get update \
+ && apt-get install cron nano
 
 WORKDIR /var/www/html
