@@ -1,23 +1,29 @@
 FROM php:7.2-apache
+#FROM php@sha256:2ffed2d1037d3b5077584990ef80d325385013a9ea1272a91ec81db969a0d5e5
 
 MAINTAINER Thomas Wiringa <t.wiringa@youwe.nl>
+
+# Workaround for broken GD build
+RUN echo "deb http://deb.debian.org/debian stretch main" >> /etc/apt/sources.list
 
 # Install php module dependencies
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
-    libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
+    libjpeg62-turbo-dev libpng-dev \
+    libfreetype6-dev=2.6.3-3.2 libfreetype6=2.6.3-3.2 \
     libbz2-dev \
     libmcrypt-dev \
     libicu-dev \
     libxslt-dev \
     libwebp-dev \
-    libxml2-dev
+    libxml2-dev \
+    libsodium-dev
 
 # Install php modules
 RUN docker-php-ext-configure gd \
-    --enable-gd-native-ttf --with-jpeg-dir=/usr/lib/x86_64-linux-gnu/ --with-png-dir=/usr/lib/x86_64-linux-gnu/ --with-freetype-dir=/usr/lib/x86_64-linux-gnu/ --with-webp-dir=/usr/lib/x86_64-linux-gnu/ \
+    --with-jpeg-dir=/usr/lib/x86_64-linux-gnu/ --with-png-dir=/usr/lib/x86_64-linux-gnu/ --with-webp-dir=/usr/lib/x86_64-linux-gnu/ --with-freetype-dir=/usr/lib/x86_64-linux-gnu/ \
  && docker-php-ext-install \
-    gd dom hash iconv intl pdo_mysql simplexml xsl bcmath soap zip ctype
+    gd dom hash iconv intl pdo_mysql simplexml xsl bcmath soap zip ctype sodium pcntl
 
 RUN usermod -u 1000 www-data
 
@@ -70,7 +76,8 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
 # Install SSMTP
-RUN apt-get update \
+RUN echo "deb http://deb.debian.org/debian stretch main" >> /etc/apt/sources.list \
+ && apt-get update \
  && apt-get install -y --no-install-recommends ssmtp
 ADD ./ssmtp.conf /etc/ssmtp/ssmtp.conf
 
@@ -79,10 +86,10 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends mysql-client
 
 # Install mod_pagespeed
-RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb \
- && dpkg -i mod-pagespeed-stable_current_amd64.deb \
- && apt-get install -f -y \
- && rm mod-pagespeed-stable_current_amd64.deb
+#RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb \
+# && dpkg -i mod-pagespeed-stable_current_amd64.deb \
+# && apt-get install -f -y \
+# && rm mod-pagespeed-stable_current_amd64.deb
 
 RUN apt-get update \
  && apt-get install cron nano
