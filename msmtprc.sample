@@ -1,0 +1,15 @@
+# Set default values for all following accounts.
+defaults
+port 587
+tls on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+
+account mailtrap
+host smtp.mailtrap.io
+from app@docker.dev.test
+auth on
+user
+password
+
+# Set a default account
+account default : mailtrap

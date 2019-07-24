@@ -1,16 +1,12 @@
 FROM php:7.2-apache
-#FROM php@sha256:2ffed2d1037d3b5077584990ef80d325385013a9ea1272a91ec81db969a0d5e5
 
 MAINTAINER Thomas Wiringa <t.wiringa@youwe.nl>
-
-# Workaround for broken GD build
-RUN echo "deb http://deb.debian.org/debian stretch main" >> /etc/apt/sources.list
 
 # Install php module dependencies
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
     libjpeg62-turbo-dev libpng-dev \
-    libfreetype6-dev=2.6.3-3.2 libfreetype6=2.6.3-3.2 \
+    libfreetype6-dev libfreetype6 \
     libbz2-dev \
     libmcrypt-dev \
     libicu-dev \
@@ -75,15 +71,16 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
-# Install SSMTP
-RUN echo "deb http://deb.debian.org/debian stretch main" >> /etc/apt/sources.list \
- && apt-get update \
- && apt-get install -y --no-install-recommends ssmtp
-ADD ./ssmtp.conf /etc/ssmtp/ssmtp.conf
+# Install MSMTP
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    msmtp
+ADD ./msmtprc /etc/msmtprc
 
 # Install a MySQL client
 RUN apt-get update \
- && apt-get install -y --no-install-recommends mysql-client
+ && apt-get install -y --no-install-recommends \
+    mariadb-client
 
 # Install mod_pagespeed
 #RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb \
@@ -92,6 +89,7 @@ RUN apt-get update \
 # && rm mod-pagespeed-stable_current_amd64.deb
 
 RUN apt-get update \
- && apt-get install cron nano
+ && apt-get install -y --no-install-recommends \
+    cron nano
 
 WORKDIR /var/www/html
