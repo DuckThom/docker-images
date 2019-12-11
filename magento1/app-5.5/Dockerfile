@@ -1,17 +1,17 @@
 FROM php:5.5-apache
 
 # Dependencies
-RUN apt-get update && apt-get install --no-install-recommends -y \
-        zlib1g-dev \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libmcrypt-dev \
-        libpng12-dev \
-        libxml2-dev \
-        wget ssmtp
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y \
+    zlib1g-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libmcrypt-dev \
+    libpng12-dev \
+    libxml2-dev \
+    wget
 
 # PHP extensions
-ADD php.ini /usr/local/etc/php/
 RUN docker-php-ext-configure \
     gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
  && docker-php-ext-install \
@@ -40,13 +40,19 @@ RUN wget https://files.magerun.net/n98-magerun-$MAGERUN_VERSION.phar \
     && chmod +x n98-magerun-$MAGERUN_VERSION.phar \
     && mv n98-magerun-$MAGERUN_VERSION.phar /usr/local/bin/magerun
 
-# SSMTP config
-ADD ./ssmtp.conf /etc/ssmtp/ssmtp.conf
-
 # Magerun Magento Vulnerability Database plugin setup
 RUN apt-get install -y --no-install-recommends git
 RUN mkdir -p /usr/local/share/n98-magerun/modules
 RUN git clone https://github.com/gwillem/magevulndb.git /usr/local/share/n98-magerun/modules/magevulndb
+
+# Install MSMTP
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    msmtp
+ADD ./msmtprc /etc/msmtprc
+
+# PHP Config file
+ADD php.ini /usr/local/etc/php/
 
 # Cleanup for smaller image
 RUN apt-get remove --purge -y git \
