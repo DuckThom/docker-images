@@ -9,7 +9,7 @@ RUN apt-get update \
     libpng-dev \
     libwebp-dev \
     libxml2-dev \
-    wget ssmtp
+    wget
 
 # PHP configuration
 ADD php.ini /usr/local/etc/php/
@@ -49,8 +49,11 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
-# SSMTP config
-ADD ./ssmtp.conf /etc/ssmtp/ssmtp.conf
+# Install MSMTP
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    msmtp
+ADD ./msmtprc /etc/msmtprc
 
 # Set www-data user id to 1000
 RUN usermod -u 1000 www-data
@@ -63,7 +66,7 @@ RUN git clone https://github.com/gwillem/magevulndb.git /usr/local/share/n98-mag
 
 # Install mysql for database access
 RUN apt-get update \
- && apt-get install -y --no-install-recommends mysql-client
+ && apt-get install -y --no-install-recommends mariadb-client
 
 # Install unzip for composer
 RUN apt-get update \
