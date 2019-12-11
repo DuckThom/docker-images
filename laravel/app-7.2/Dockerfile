@@ -63,8 +63,8 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
 
 # Install SSMTP
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ssmtp
-ADD ./ssmtp.conf /etc/ssmtp/ssmtp.conf
+ && apt-get install -y --no-install-recommends msmtp
+ADD ./msmtprc /etc/msmtprc
 
 # Cleanup
 RUN apt-get clean \
