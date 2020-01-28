@@ -92,3 +92,8 @@ RUN echo "bind '\"\e[1;5D\":backward-word'" >> /etc/bash.bashrc
 
 # Set a nice bash prompt
 RUN echo "PS1='\[\033[0;32m\]\[\033[0m\033[0;32m\]\u\[\033[0;36m\] @ Docker container \[\033[0;36m\]\h \w\[\033[0;32m\]\n\[\033[0;32m\]└─\[\033[0m\033[0;32m\] \$\[\033[0m\033[0;32m\] ▶\[\033[0m\] '" >> /etc/bash.bashrc
+
+# Enable Redis support
+RUN pecl install -o -f redis \
+ && docker-php-ext-enable redis
+
