@@ -10,8 +10,6 @@ pattern = '^(.+)\/(.+)\/'
 buildImage = sys.argv[1] if len(sys.argv) >= 2 else None
 buildTag = sys.argv[2] if len(sys.argv) >= 3 else None
 
-print(buildImage)
-
 for dockerfile in dockerfiles:
     a = re.search(pattern, dockerfile)
     image = a.group(1)
